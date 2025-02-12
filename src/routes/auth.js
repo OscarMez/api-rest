@@ -1,9 +1,15 @@
 const express = require('express');
+
 const { body, validationResult } = require('express-validator');
 const { auth, isAdmin } = require('../middleware/auth');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
+
+
+console.log('Token --> JWT_SECRET:', process.env.JWT_SECRET);
+
+
 
 /**
  * @swagger

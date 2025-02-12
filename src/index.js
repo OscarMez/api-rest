@@ -1,4 +1,6 @@
 require('dotenv').config();
+console.log('JWT_SECRET:', process.env.JWT_SECRET);
+
 const express = require('express');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
@@ -6,6 +8,11 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const sequelize = require('./config/database');
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
+
+const jwt = require('jsonwebtoken'); // <-- Esto soluciona el error de jwt no definido
+
+
+
 
 const app = express();
 
@@ -55,4 +62,6 @@ sequelize.sync().then(() => {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
+// IMPRIMIR
+  
 });
