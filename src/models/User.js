@@ -18,11 +18,22 @@ const User = sequelize.define('User', {
     unique: true,
     validate: {
       isEmail: true
+    },
+    set(value) {
+      this.setDataValue('email', value.toLowerCase()); // Guarda el email en minúsculas
     }
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      len: [8, 100], // Mínimo 8 caracteres
+      isStrongPassword(value) {
+        if (!/[A-Z]/.test(value) || !/[a-z]/.test(value) || !/[0-9]/.test(value) || !/[^A-Za-z0-9]/.test(value)) {
+          throw new Error('La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial.');
+        }
+      }
+    }
   },
   role: {
     type: DataTypes.ENUM('ADMIN', 'USER'),
@@ -30,13 +41,16 @@ const User = sequelize.define('User', {
   }
 }, {
   hooks: {
-    beforeCreate: async (user) => {
-      user.password = await bcrypt.hash(user.password, 10);
+    beforeSave: async (user) => {
+      if (user.changed('password')) { // Solo en caso de que la contraseña cambie
+        user.password = await bcrypt.hash(user.password, 10);
+      }
     }
   }
 });
 
-User.prototype.validatePassword = async function(password) {
+// Método para comparar la contraseña con la almacenada en la base de datos
+User.prototype.validatePassword = async function (password) {
   return bcrypt.compare(password, this.password);
 };
 
